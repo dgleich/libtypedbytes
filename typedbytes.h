@@ -516,7 +516,7 @@ public:
     /** Write out opaque typedbytes data direct to the stream. 
      * This is just a high level wrapper around fwrite to the stream.
      * */
-    bool write_opaque_bytes(unsigned char* bytes, size_t size) {
+    bool write_opaque_bytes(const unsigned char* bytes, size_t size) {
         if (_write_bytes(bytes, 1, size)) {
             return true;
         } 
