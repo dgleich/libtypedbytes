@@ -27,6 +27,19 @@ static inline void push_opaque_length(
     len = bswap32(len);
     push_opaque_bytes(buffer, (unsigned char*)&len, sizeof(typedbytes_length));
 }
+
+static inline bool checkedfread(
+    void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+    size_t nread = fread(ptr, size, nmemb, stream);
+    if (nread == size*nmemb) {
+        return true; 
+    } else {
+        return false;
+    }
+}
+
+#define RETURNIFFALSE(a) {if (!(a)) { return false; }}
     
 
 bool TypedBytesInFile::_read_opaque_primitive(typedbytes_opaque& buffer, 
@@ -47,19 +60,19 @@ bool TypedBytesInFile::_read_opaque_primitive(typedbytes_opaque& buffer,
     switch (t) {
         case TypedBytesByte:
         case TypedBytesBoolean:
-            fread(&bytebuf, sizeof(unsigned char), 1, stream);
+            RETURNIFFALSE(checkedfread(&bytebuf, sizeof(unsigned char), 1, stream));
             push_opaque_bytes(buffer, &bytebuf, sizeof(unsigned char));
             break;
             
         case TypedBytesInteger:
         case TypedBytesFloat:
-            fread(&intbuf, sizeof(int32_t), 1, stream);
+            RETURNIFFALSE(checkedfread(&intbuf, sizeof(int32_t), 1, stream));
             push_opaque_bytes(buffer, (unsigned char*)&intbuf, sizeof(int32_t));
             break;
             
         case TypedBytesLong:
         case TypedBytesDouble:
-            fread(&longbuf, sizeof(int64_t), 1, stream);
+            RETURNIFFALSE(checkedfread(&longbuf, sizeof(int64_t), 1, stream));
             push_opaque_bytes(buffer, (unsigned char*)&longbuf, sizeof(int64_t));
             break;
             
@@ -69,11 +82,12 @@ bool TypedBytesInFile::_read_opaque_primitive(typedbytes_opaque& buffer,
             while (len > 0) {
                 // stream to buffer in longbuf bytes at a time.
                 if (len >= 8) {
-                    fread(&longbuf, sizeof(int64_t), 1, stream);
+                    RETURNIFFALSE(checkedfread(
+                        &longbuf, sizeof(int64_t), 1, stream));
                     push_opaque_bytes(buffer, 
                         (unsigned char*)&longbuf, sizeof(int64_t));
                 } else {
-                    fread(&longbuf, len, 1, stream);
+                    RETURNIFFALSE(checkedfread(&longbuf, len, 1, stream));
                     push_opaque_bytes(buffer, 
                         (unsigned char*)&longbuf, len);
                 }
