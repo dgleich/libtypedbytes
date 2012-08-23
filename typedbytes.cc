@@ -91,7 +91,7 @@ bool TypedBytesInFile::_read_opaque_primitive(typedbytes_opaque& buffer,
                     RETURNIFFALSE(checkedfread(&longbuf, len, 1, stream));
                     push_opaque_bytes(buffer, 
                         (unsigned char*)&longbuf, len);
-                    break;
+                    len = 0;
                 }
             }
             break;
