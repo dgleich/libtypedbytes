@@ -86,10 +86,12 @@ bool TypedBytesInFile::_read_opaque_primitive(typedbytes_opaque& buffer,
                         &longbuf, sizeof(int64_t), 1, stream));
                     push_opaque_bytes(buffer, 
                         (unsigned char*)&longbuf, sizeof(int64_t));
+                    len -= sizeof(int64_t);
                 } else {
                     RETURNIFFALSE(checkedfread(&longbuf, len, 1, stream));
                     push_opaque_bytes(buffer, 
                         (unsigned char*)&longbuf, len);
+                    len = 0;
                 }
             }
             break;
